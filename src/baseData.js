@@ -127,7 +127,7 @@ module.exports = function (Str, callback) {
             });
         },
         baseObj: function (call) {
-            call(null, dateFromobj_ID(ObjID));
+            call(null, new Date().getTime() + new Date().getMilliseconds());
         },
         baseData: function (call) {
             call(null, baseData());
