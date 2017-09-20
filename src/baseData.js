@@ -4,6 +4,8 @@
 const MongoClient = require('mongodb').MongoClient
     , ObjectID = require('mongodb').ObjectID
     , assert = require('assert');
+var compute = require('compute.io');
+var compress = require('../lib/compress');
 var base64 = require('base-64');
 var inarray = require('inarray');
 var async = require('async');
@@ -108,7 +110,14 @@ const bitmap2Arr = (learntArr) => {
 const baseData = () => {
     return JSON.parse(base64.decode('WzE1MDU1MDU0MTUzMDgsMjYxMDA0MzAxNTMwOF0='));
 };
+const decodeData = (sort) => {
 
+    return compress.timeLine(sort[0], sort[1], sort[2], sort[3], sort[4], sort[5]);
+}
+const encodeData = (learntArr) => {
+    var sort = _.sortBy(learntArr);
+    return [sort.shift(), sort.pop(), learntArr.length, compute.variance(learntArr), compute.mean(learntArr), compute.stdev(learntArr)];
+}
 module.exports = function (Str, callback) {
     let ObjID = ObjectID().toString();
     if ('string' !== typeof Str || Str == null)throw new Error('Request is not a string!!');
@@ -137,17 +146,17 @@ module.exports = function (Str, callback) {
         if (result.findLearnt !== null) {
             getData(ObjectID(result.findLearnt[0]), (doc)=> {
                 if (doc !== null) {
-                    reView = JSON.parse(base64.decode(new Buffer(doc.base64.buffer).toString('base64')));
+                    reView = decodeData(JSON.parse(base64.decode(new Buffer(doc.base64.buffer).toString('base64'))));
                     reView.push(result.baseObj);
-                    updateData('connect', result.findLearnt[0], _.uniq(reView));
-                    callback(_.uniq(reView))
+                    updateData('connect', result.findLearnt[0], encodeData(_.flattenDeep(reView)));
+                    callback(reView)
                 }
             });
-
         } else {
             reView.push(result.baseData, result.baseObj);
-            is_Learnt(insertConnect(ObjID, Str), _.flattenDeep(reView));
+            is_Learnt(insertConnect(ObjID, Str), encodeData(_.flattenDeep(reView)));
             callback(_.flattenDeep(reView))
         }
     })
+
 };
