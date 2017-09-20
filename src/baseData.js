@@ -113,11 +113,11 @@ const baseData = () => {
 const decodeData = (sort) => {
 
     return compress.timeLine(sort[0], sort[1], sort[2], sort[3], sort[4], sort[5]);
-}
+};
 const encodeData = (learntArr) => {
     var sort = _.sortBy(learntArr);
     return [sort.shift(), sort.pop(), learntArr.length, compute.variance(learntArr), compute.mean(learntArr), compute.stdev(learntArr)];
-}
+};
 module.exports = function (Str, callback) {
     let ObjID = ObjectID().toString();
     if ('string' !== typeof Str || Str == null)throw new Error('Request is not a string!!');
