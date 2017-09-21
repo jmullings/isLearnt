@@ -147,15 +147,15 @@ module.exports = function (Str, callback) {
             getData(ObjectID(result.findLearnt[0]), (doc)=> {
                 if (doc !== null) {
                     reView = decodeData(JSON.parse(base64.decode(new Buffer(doc.base64.buffer).toString('base64'))));
-                    reView.push(result.baseObj);
-                    updateData('connect', result.findLearnt[0], encodeData(_.flattenDeep(reView)));
+                    reView =  _.union(reView,[result.baseObj]);
+                    updateData('connect', result.findLearnt[0], encodeData(reView));
                     callback(reView)
                 }
             });
         } else {
-            reView.push(result.baseData, result.baseObj);
-            is_Learnt(insertConnect(ObjID, Str), encodeData(_.flattenDeep(reView)));
-            callback(_.flattenDeep(reView))
+            reView = _.union(result.baseData,[result.baseObj]);
+            is_Learnt(insertConnect(ObjID, Str), encodeData(reView));
+            callback(reView)
         }
     })
 
